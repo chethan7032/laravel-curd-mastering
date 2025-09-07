@@ -15,22 +15,17 @@ class CustomerController extends Controller
      */
     public function index(Request $request)
     {
-        // if($request->has('search'))
-        // {
+   
 
-        // }
-
-
-
-        $customers = Customer::when($request->has('search'),function($query) use ($request){
-            $query->where('first_name','LIKE',"%$request->search")
-            ->orWhere('last_name','LIKE',"%$request->search")
-            ->orWhere('email','LIKE',"%$request->search")
-            ->orWhere('phone','LIKE',"%$request->search");
-
-
-        }
-    )->get();
+        $customers = Customer::when(
+            $request->has('search'),
+            function ($query) use ($request) {
+                $query->where('first_name', 'LIKE', "%$request->search")
+                    ->orWhere('last_name', 'LIKE', "%$request->search")
+                    ->orWhere('email', 'LIKE', "%$request->search")
+                    ->orWhere('phone', 'LIKE', "%$request->search");
+            }
+        )->orderBy('id', $request->has('order')  && $request->order == 'asc' ? 'ASC' : 'DESC')->get();
 
 
         return view('customers.index', compact('customers'));
@@ -72,8 +67,8 @@ class CustomerController extends Controller
      */
     public function show(string $id)
     {
-       $customer=Customer::findOrFail($id);
-       return view('customers.detail',compact('customer'));
+        $customer = Customer::findOrFail($id);
+        return view('customers.detail', compact('customer'));
     }
 
     /**
@@ -81,7 +76,7 @@ class CustomerController extends Controller
      */
     public function edit(string $id)
     {
-       
+
 
         $customer = Customer::findOrFail($id);
         return view('customers.edit', compact('customer'));
@@ -92,11 +87,11 @@ class CustomerController extends Controller
      */
     public function update(CustomerStoreRequest $request, string $id)
     {
-          $data=Customer::findOrFail($id);
-          // delete the previous image
-          File::delete(public_path($data->image));
-            
-          //Handle file
+        $data = Customer::findOrFail($id);
+        // delete the previous image
+        File::delete(public_path($data->image));
+
+        //Handle file
         if ($request->hasFile('image')) {
             $file = $request->file('image');
             $filename = $file->store('', 'public');
@@ -113,16 +108,32 @@ class CustomerController extends Controller
         return redirect()->route('customer.index');
     }
 
-   
+
     /**
      * Remove the specified resource from storage.
      */
     public function destroy(string $id)
     {
-       $customer=Customer::findOrFail($id);
-         // delete the previous image
-            File::delete(public_path($customer->image));
-         $customer->delete();
-            return redirect()->route('customer.index');
+        $customer = Customer::findOrFail($id);
+        // delete the previous image
+        File::delete(public_path($customer->image));
+        $customer->delete();
+        return redirect()->route('customer.index');
     }
+
+      public function trash(Request $request)
+      {
+         $customers = Customer::when(
+            $request->has('search'),
+            function ($query) use ($request) {
+                $query->where('first_name', 'LIKE', "%$request->search")
+                    ->orWhere('last_name', 'LIKE', "%$request->search")
+                    ->orWhere('email', 'LIKE', "%$request->search")
+                    ->orWhere('phone', 'LIKE', "%$request->search");
+            }
+        )->orderBy('id', $request->has('order')  && $request->order == 'asc' ? 'ASC' : 'DESC')->get();
+
+        return view('customers.trash' , compact('customers'));
+      }
+
 }
