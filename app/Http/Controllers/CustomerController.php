@@ -116,14 +116,15 @@ class CustomerController extends Controller
     {
         $customer = Customer::findOrFail($id);
         // delete the previous image
-        File::delete(public_path($customer->image));
+        // File::delete(public_path($customer->image));
         $customer->delete();
         return redirect()->route('customer.index');
     }
 
       public function trash(Request $request)
       {
-         $customers = Customer::when(
+         $customers = Customer::onlyTrashed()
+         ->when(
             $request->has('search'),
             function ($query) use ($request) {
                 $query->where('first_name', 'LIKE', "%$request->search")
@@ -135,5 +136,28 @@ class CustomerController extends Controller
 
         return view('customers.trash' , compact('customers'));
       }
+
+      public function restoreTrash(string $id)
+      {
+        $customer =Customer::onlyTrashed()->findOrFail($id);
+        $customer->restore();
+
+        return redirect()->back();
+
+      }
+
+      public function permentdelete(string $id)
+      {
+        $customer =Customer::onlyTrashed()->findOrFail($id);
+        
+            File::forceDelete(public_path($customer->image));
+
+        
+             $customer->forceDelete();
+             return redirect()->back();
+
+      }
+
+
 
 }

@@ -67,18 +67,19 @@
 
                                     <td>
 
-                                        <a href="{{ route('customer.edit', $customer->id) }}" style="color: #2c2c2c;"
-                                            class="ms-1 me-1"><i class="far fa-edit"></i></a>
-                                        <a href="{{ route('customer.show', $customer->id) }}" style="color: #2c2c2c;"
-                                            class="ms-1 me-1"><i class="far fa-eye"></i></a>
+                                        
+
+                                        <a href="{{ route('customer.restore', $customer->id) }}" style="color: #2c2c2c;"
+                                            class="ms-1 me-1"><i class="fa fa-redo"></i></a>
+
                                         <a href="javascript:;"
                                             onclick="
-                                            if(confirm('Are you sure you want to delete this customer?')) {
+                                            if(confirm('Are you sure you want to permanently delete this customer?')) {
                                                 $('.form-{{ $customer->id }}').submit();
                                             }"
                                             style="color: #2c2c2c;" class="ms-1 me-1"><i class="fas fa-trash-alt"></i></a>
                                         <form class="form-{{ $customer->id }}"
-                                            action="{{ route('customer.destroy', $customer->id) }}" method="POST">
+                                            action="{{ route('customer.permentdelete', $customer->id) }}" method="POST">
                                             @csrf
                                             @method('DELETE')
 
